@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+:root {
+  --rojo-tinto: #730d0d;
+  --chocolate: #4c1e0d;
+  --amarillo: #f2d06b;
+  --coral: #f28a80;
+  --cream: #faf6f0;
+  --background: #4c1e0d;
+  --foreground: #faf6f0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-rojo: var(--rojo-tinto);
+  --color-chocolate: var(--chocolate);
+  --color-amarillo: var(--amarillo);
+  --color-coral: var(--coral);
+  --color-cream: var(--cream);
+  --font-sans: var(--font-poppins);
+  --font-display: var(--font-bebas);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-poppins), system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-bebas), Impact, sans-serif;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--amarillo);
+  padding: 0.75rem 1.75rem;
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--chocolate);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--coral);
+  color: var(--chocolate);
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--cream) 35%, transparent);
+  background: transparent;
+  padding: 0.75rem 1.75rem;
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cream);
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--amarillo);
+  color: var(--amarillo);
+  background: color-mix(in srgb, var(--amarillo) 8%, transparent);
+}
+
+.field-input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, white 15%, transparent);
+  background: color-mix(in srgb, var(--rojo-tinto) 30%, transparent);
+  padding: 0.65rem 0.75rem;
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-size: 0.875rem;
+  color: var(--cream);
+  outline: none;
+}
+
+.field-input:focus {
+  border-color: var(--amarillo);
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s ease-out both;
+}
+
+.animate-fade-up-delay {
+  animation: fade-up 0.7s ease-out 0.15s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-up-delay {
+    animation: none;
+  }
+}

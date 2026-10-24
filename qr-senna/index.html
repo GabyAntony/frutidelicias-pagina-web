@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruleta de la Senna</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="cabecera">
+  <h1 id="titulo-app">Ruleta de la Senna</h1>
+  <p class="subtitulo">Girala y obtén un código único que nunca se repite.</p>
+</header>
+
+<main class="layout">
+
+  <!-- ============ RULETA ============ -->
+  <section class="panel ruleta-panel">
+    <div class="ruleta-caja">
+      <canvas id="ruleta" aria-label="Ruleta de la suerte"></canvas>
+      <div class="aguja" aria-hidden="true"></div>
+    </div>
+
+    <div class="controles">
+      <button id="btn-girar" class="btn btn-primario">Girar la ruleta</button>
+      <label class="check">
+        <input type="checkbox" id="chk-sonido" checked> Sonido del tic
+      </label>
+    </div>
+
+    <p id="mensaje" class="mensaje"></p>
+
+    <div id="resultado" class="resultado" role="status" aria-live="polite">
+      <p class="resultado-vacio">Pulsa "Girar la ruleta" para sortear.</p>
+    </div>
+  </section>
+
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/codigos.js"></script>
+<script src="js/ruleta.js"></script>
+</body>
+</html>

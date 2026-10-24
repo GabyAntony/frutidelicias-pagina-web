@@ -1,0 +1,10 @@
+run = "bash ./start.sh"
+entrypoint = "backend/main.py"
+modules = ["python-3.11"]
+
+# Solo se publica el frontend (puerto 3000 -> 80). El frontend hace de proxy
+# hacia el backend con /backend/*, así que la cookie de sesión del panel es
+# "same-origin" y no hace falta exponer el puerto 8000.
+[[ports]]
+localPort = 3000
+externalPort = 80
