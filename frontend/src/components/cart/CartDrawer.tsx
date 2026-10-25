@@ -115,7 +115,7 @@ export function CartDrawer() {
       idempotencyKeyRef.current = newIdempotencyKey();
     }
     try {
-      const response = await apiFetch("/api/orders", {
+      const response = await apiFetch("/orders", {
         method: "POST",
         headers: { "Idempotency-Key": idempotencyKeyRef.current },
         body: JSON.stringify({

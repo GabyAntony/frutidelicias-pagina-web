@@ -80,7 +80,7 @@ export default function AdminPage() {
   /** Consulta los pedidos sin tocar el estado (se usa desde los efectos). */
   const fetchOrders = useCallback(async (status: string) => {
     const query = status ? `?status_filter=${encodeURIComponent(status)}` : "";
-    const res = await apiFetch(`/api/admin/orders${query}`);
+    const res = await apiFetch(`/admin/orders${query}`);
     if (!res.ok) {
       return { ok: false as const, unauthorized: res.status === 401, orders: [] as Order[] };
     }
@@ -93,7 +93,7 @@ export default function AdminPage() {
 
   /** Consulta los datos del local sin tocar el estado. */
   const fetchStore = useCallback(async () => {
-    const res = await apiFetch("/api/store");
+    const res = await apiFetch("/store");
     if (!res.ok) return null;
     return (await res.json()) as StoreInfo;
   }, []);
@@ -112,7 +112,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     let cancelled = false;
-    apiFetch("/api/admin/me")
+    apiFetch("/admin/me")
       .then((res) => {
         if (!cancelled) setAuthed(res.ok);
       })
@@ -146,7 +146,7 @@ export default function AdminPage() {
   async function onLogin(e: FormEvent) {
     e.preventDefault();
     setLoginError("");
-    const res = await apiFetch("/api/admin/login", {
+    const res = await apiFetch("/admin/login", {
       method: "POST",
       headers: adminHeaders,
       body: JSON.stringify({ username, password }),
@@ -161,7 +161,7 @@ export default function AdminPage() {
   }
 
   async function onLogout() {
-    await apiFetch("/api/admin/logout", {
+    await apiFetch("/admin/logout", {
       method: "POST",
       headers: adminHeaders,
     });
@@ -172,7 +172,7 @@ export default function AdminPage() {
 
   async function changeStatus(publicId: string, status: string) {
     setError("");
-    const res = await apiFetch(`/api/admin/orders/${publicId}/status`, {
+    const res = await apiFetch(`/admin/orders/${publicId}/status`, {
       method: "PATCH",
       headers: adminHeaders,
       body: JSON.stringify({ status }),
@@ -188,7 +188,7 @@ export default function AdminPage() {
 
   async function markPaid(publicId: string) {
     setError("");
-    const res = await apiFetch(`/api/admin/orders/${publicId}/payment`, {
+    const res = await apiFetch(`/admin/orders/${publicId}/payment`, {
       method: "PATCH",
       headers: adminHeaders,
       body: JSON.stringify({ payment_status: "pagado" }),
@@ -213,7 +213,7 @@ export default function AdminPage() {
       contact_phone: String(form.get("contact_phone") ?? ""),
       payment_methods: String(form.get("payment_methods") ?? ""),
     };
-    const res = await apiFetch("/api/admin/settings", {
+    const res = await apiFetch("/admin/settings", {
       method: "PUT",
       headers: adminHeaders,
       body: JSON.stringify(payload),

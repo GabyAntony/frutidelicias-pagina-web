@@ -11,7 +11,8 @@ BACKEND_PORT="${BACKEND_PORT:-8000}"
 FRONTEND_PORT="${FRONTEND_PORT:-3000}"
 
 export BACKEND_URL="${BACKEND_URL:-http://127.0.0.1:${BACKEND_PORT}}"
-export DATABASE_URL="${DATABASE_URL:-sqlite:///${ROOT}/backend/data/fruti.db}"
+# Postgres local (levanta la base con `docker compose up -d db`).
+export DATABASE_URL="${DATABASE_URL:-postgresql+psycopg://fruti:fruti@localhost:5432/fruti}"
 export PYTHONUNBUFFERED=1
 
 cd "$ROOT/backend"

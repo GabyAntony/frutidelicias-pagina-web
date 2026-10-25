@@ -79,7 +79,7 @@ if not session_secret:
     session_secret = secrets.token_urlsafe(32)
     logger.warning(
         "SECRET_KEY no está configurada. El panel de administración quedará "
-        "deshabilitado hasta que la definas en los Secrets de Replit."
+        "deshabilitado hasta que la definas en las variables de entorno."
     )
 elif not admin_configured():
     logger.warning(

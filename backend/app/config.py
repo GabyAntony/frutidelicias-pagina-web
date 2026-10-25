@@ -10,7 +10,12 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    database_url: str = "sqlite:///./data/fruti.db"
+    # Postgres por defecto. En local se levanta con `docker compose up -d db`;
+    # en Vercel se define DATABASE_URL con la URL del Postgres gestionado.
+    # SQLite sigue disponible para pruebas: sqlite:///./data/fruti.db
+    database_url: str = (
+        "postgresql+psycopg://fruti:fruti@localhost:5432/fruti"
+    )
     secret_key: str = ""
     admin_username: str = ""
     admin_password: str = ""

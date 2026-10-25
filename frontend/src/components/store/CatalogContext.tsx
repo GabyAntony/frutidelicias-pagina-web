@@ -48,7 +48,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false;
 
-    apiFetch("/api/products")
+    apiFetch("/products")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (cancelled) return;

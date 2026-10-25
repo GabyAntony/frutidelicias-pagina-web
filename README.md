@@ -3,20 +3,21 @@
 Landing page del negocio Fruti Delicias: fruta fresca + chocolate irresistible.
 
 - **Frontend:** Next.js 16 (App Router) + Tailwind CSS 4
-- **Backend:** Python 3.11+ (FastAPI) + SQLAlchemy + SQLite
+- **Backend:** Python 3.11+ (FastAPI) + SQLAlchemy + PostgreSQL
 
 ## Estructura
 
 ```
 proyecto-senna/
 ├── .replit            # configuración de arranque en Replit
+├── compose.yaml       # Postgres local para desarrollo
 ├── start.sh           # arranque de producción (backend + frontend)
 ├── dev.sh             # arranque local con recarga automática
 ├── frontend/          # Next.js (App Router)
 │   └── public/images/ # Coloca aquí las fotos del producto
 ├── backend/           # FastAPI
 │   ├── app/           # catálogo, pedidos, auth, Telegram
-│   ├── data/          # fruti.db (base de datos persistente)
+│   ├── data/          # datos locales (SQLite opcional)
 │   └── tests/         # pytest
 └── qr-senna/          # ruleta de la suerte (proyecto aparte, sin build)
 ```
@@ -49,7 +50,9 @@ en efectivo o Nequi al recoger. No hay pagos en línea.
 - **Catálogo:** el frontend lo pide a `GET /api/products`, así que el cliente
   siempre ve el precio vigente. La lista estática del frontend es solo un
   respaldo de primer pintado.
-- **Persistencia:** SQLite en `backend/data/fruti.db` (sobrevive reinicios en Replit).
+- **Persistencia:** PostgreSQL (por defecto el de `compose.yaml` en local; en
+  Vercel, una base gestionada como Vercel Postgres/Neon). SQLite queda como
+  alternativa para pruebas y para el arranque de Replit sin `DATABASE_URL`.
 - **Panel:** `/admin` con sesión httpOnly firmada con `SECRET_KEY`. Todos los
   endpoints `/api/admin/*` exigen sesión válida + cabecera `X-Requested-With`.
 - **Telegram:** alerta al dueño cuando entra un pedido nuevo. Se envía en
@@ -90,8 +93,8 @@ En el **backend** (carpeta `backend/`):
 | `ADMIN_PASSWORD` | Contraseña del panel. No la subas al repo. |
 | `TELEGRAM_BOT_TOKEN` | Token del bot (BotFather). Solo servidor. |
 | `TELEGRAM_CHAT_ID` | Chat o grupo donde llegarán los pedidos. |
-| `DATABASE_URL` | Opcional. Por defecto `sqlite:///<ruta>/backend/data/fruti.db`. |
-| `FRONTEND_ORIGINS` | Orígenes permitidos, separados por coma. Debe incluir `https://<tu-app>.replit.app`. |
+| `DATABASE_URL` | URL de Postgres. Por defecto `postgresql+psycopg://fruti:fruti@localhost:5432/fruti` (el Postgres de `compose.yaml`). Para pruebas también se acepta SQLite: `sqlite:///./data/fruti.db`. |
+| `FRONTEND_ORIGINS` | Orígenes permitidos, separados por coma. Debe incluir `https://<tu-app>.replit.app` o tu dominio de Vercel. |
 | `COOKIE_SECURE` | `true` en HTTPS (producción). |
 | `COOKIE_SAMESITE` | `lax` (recomendado). |
 
@@ -99,8 +102,8 @@ En el **frontend** (carpeta `frontend/`):
 
 | Variable | Uso |
 |----------|-----|
-| `BACKEND_URL` | URL interna del API, p. ej. `http://127.0.0.1:8000`. |
-| `NEXT_PUBLIC_API_URL` | Debe ser `/backend` para el proxy same-origin (cookies). |
+| `BACKEND_URL` | Solo local/Replit: URL interna del API a la que el frontend reescribe `/api/*`, p. ej. `http://127.0.0.1:8000`. **No se define en Vercel** (el enrutamiento lo hace `vercel.json`). |
+| `NEXT_PUBLIC_API_URL` | Raíz del API usada por el navegador. Por defecto `/api` (mismo origen). En Vercel no hace falta definirla. |
 
 Cómo obtener Telegram:
 
@@ -128,14 +131,68 @@ El botón **Run** ejecuta `bash ./start.sh`, que:
 4. compila el frontend y lo sirve en `0.0.0.0:3000`.
 
 Solo se publica el puerto **3000**. El frontend hace de proxy hacia la API con
-`/backend/*`, así que la cookie de sesión del panel es *same-origin* y no hace
+`/api/*`, así que la cookie de sesión del panel es *same-origin* y no hace
 falta exponer el puerto 8000.
 
 Antes del primer arranque, define los Secrets del backend en Replit
 (panel **Secrets**) y `BACKEND_URL=http://127.0.0.1:8000` en las variables del
-frontend.
+frontend. `start.sh` usa SQLite por defecto en Replit; si defines `DATABASE_URL`
+con una URL de Postgres, la respeta.
+
+### En Vercel (servicios)
+
+El repositorio incluye `vercel.json` en la raíz con dos servicios:
+
+| Servicio | Carpeta | Ruta pública |
+|----------|---------|--------------|
+| `backend` | `backend/` | `/api/*` |
+| `frontend` | `frontend/` | todas las demás rutas (`/`, `/admin`, …) |
+
+Importa el repositorio en Vercel sin configurar un *Root Directory*: Vercel lee
+`vercel.json`. El backend es un FastAPI con entrypoint `main:app` y el frontend
+es Next.js.
+
+Variables de entorno del proyecto en Vercel (las usa el servicio `backend`):
+
+| Variable | Valor |
+|----------|-------|
+| `SECRET_KEY`, `ADMIN_USERNAME`, `ADMIN_PASSWORD` | Igual que en Replit. |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Opcionales, para las alertas. |
+| `FRONTEND_ORIGINS` | `https://<tu-proyecto>.vercel.app` (y los dominios de preview que uses). |
+| `COOKIE_SECURE` | `true`. |
+| `COOKIE_SAMESITE` | `lax`. |
+| `DATABASE_URL` | URL de Postgres gestionado. Es la forma de persistir los pedidos en Vercel. |
+
+> **Postgres en Vercel.** Crea una base con **Vercel Postgres/Neon** (Storage en
+> el dashboard) o usa cualquier Postgres externo. Copia su cadena de conexión en
+> `DATABASE_URL`; se aceptan tanto `postgresql://...` como
+> `postgresql+psycopg://...` (el código normaliza el driver). Las tablas se crean
+> solas al arrancar el backend (`Base.metadata.create_all` en el lifespan), así
+> que no hace falta ejecutar migraciones para esta versión.
+>
+> Usa preferiblemente la URL *pooled* que ofrece el proveedor para funciones
+> serverless. No uses SQLite en Vercel: el sistema de archivos de las funciones
+> es efímero y no permite conservar los pedidos.
+
+No definas `BACKEND_URL` ni `NEXT_PUBLIC_API_URL` en Vercel: el navegador llama
+a `/api/*` en el mismo dominio y `vercel.json` lo enruta al servicio `backend`.
+No hay llamadas servidor-a-servidor, así que no se necesitan *bindings*.
+
+Para probar todo junto en local con el enrutamiento real de Vercel:
+
+```bash
+vercel dev
+```
 
 ### Local
+
+Levanta Postgres con Docker (solo la primera vez crea el volumen):
+
+```bash
+docker compose up -d db
+```
+
+Luego arranca todo:
 
 ```bash
 # Todo junto (recomendado)
@@ -145,10 +202,14 @@ bash ./dev.sh
 O por partes:
 
 ```bash
+# Desde la raíz, para tener Postgres disponible
+docker compose up -d db
+
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+cp .env.example .env   # ajusta SECRET_KEY y credenciales
 uvicorn main:app --reload --port 8000
 
 cd ../frontend
@@ -181,7 +242,7 @@ WhatsApp.
 
 ```bash
 cd backend
-.venv/bin/python -m pytest -q          # 53 pruebas
+.venv/bin/python -m pytest -q          # 55 pruebas
 cd ../frontend
 npm run lint && npm run build
 ```

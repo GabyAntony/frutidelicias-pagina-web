@@ -1,4 +1,12 @@
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "/backend";
+/**
+ * Raíz del API.
+ *
+ * En Vercel, `vercel.json` enruta `/api/*` al servicio `backend`, así que el
+ * valor por defecto funciona sin configurar nada: mismo origen y cookies
+ * incluidas. En desarrollo local se puede apuntar a otro origen, por ejemplo
+ * `http://localhost:8000/api`.
+ */
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
 export function formatCop(amount: number): string {
   return new Intl.NumberFormat("es-CO", {

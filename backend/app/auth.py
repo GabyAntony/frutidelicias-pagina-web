@@ -9,7 +9,7 @@ SESSION_ROLE_KEY = "role"
 
 PANEL_NOT_CONFIGURED = (
     "El panel no está configurado. Define SECRET_KEY, ADMIN_USERNAME y "
-    "ADMIN_PASSWORD en los Secrets de Replit."
+    "ADMIN_PASSWORD en las variables de entorno."
 )
 
 

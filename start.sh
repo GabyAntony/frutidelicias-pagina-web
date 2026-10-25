@@ -5,7 +5,7 @@
 #   bash ./start.sh
 #
 # El frontend (puerto 3000) es el único proceso público. Hace de proxy hacia
-# el backend con /backend/*, así que las cookies de sesión son "same-origin".
+# el backend con /api/*, así que las cookies de sesión son "same-origin".
 #
 set -euo pipefail
 

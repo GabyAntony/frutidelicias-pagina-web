@@ -24,7 +24,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
-    apiFetch("/api/store")
+    apiFetch("/store")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!cancelled && data) setStore(data);
